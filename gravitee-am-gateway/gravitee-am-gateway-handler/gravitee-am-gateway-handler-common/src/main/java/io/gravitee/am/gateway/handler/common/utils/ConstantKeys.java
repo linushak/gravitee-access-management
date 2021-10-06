@@ -101,4 +101,5 @@ public interface ConstantKeys {
     String REQUEST_URI_ID_KEY = "requestUriId";
     String REQUEST_OBJECT_FROM_URI = "request-object-from-uri";
 
+    String CIBA_AUTH_REQUEST_KEY = "ciba_authentication_request";
 }

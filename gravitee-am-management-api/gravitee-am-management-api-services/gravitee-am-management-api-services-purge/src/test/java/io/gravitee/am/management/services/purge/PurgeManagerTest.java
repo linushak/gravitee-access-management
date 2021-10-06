@@ -18,10 +18,8 @@ package io.gravitee.am.management.services.purge;
 import io.gravitee.am.repository.management.api.AuthenticationFlowContextRepository;
 import io.gravitee.am.repository.management.api.LoginAttemptRepository;
 import io.gravitee.am.repository.management.api.PermissionTicketRepository;
-import io.gravitee.am.repository.oauth2.api.AccessTokenRepository;
-import io.gravitee.am.repository.oauth2.api.AuthorizationCodeRepository;
-import io.gravitee.am.repository.oauth2.api.RefreshTokenRepository;
-import io.gravitee.am.repository.oauth2.api.ScopeApprovalRepository;
+import io.gravitee.am.repository.oauth2.api.*;
+import io.gravitee.am.repository.oidc.api.CibaAuthRequestRepository;
 import io.gravitee.am.repository.oidc.api.RequestObjectRepository;
 import io.reactivex.Completable;
 import org.junit.Before;
@@ -30,6 +28,8 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -70,6 +70,12 @@ public class PurgeManagerTest {
     @Mock
     private AuthenticationFlowContextRepository authenticationFlowContextRepository;
 
+    @Mock
+    protected PushedAuthorizationRequestRepository pushedAuthorizationRequestRepository;
+
+    @Mock
+    protected CibaAuthRequestRepository cibaAuthRequestRepository;
+
     @Before
     public void prepare() {
         when(accessTokenRepository.purgeExpiredData()).thenReturn(Completable.complete());
@@ -80,6 +86,8 @@ public class PurgeManagerTest {
         when(refreshTokenRepository.purgeExpiredData()).thenReturn(Completable.complete());
         when(requestObjectRepository.purgeExpiredData()).thenReturn(Completable.complete());
         when(authenticationFlowContextRepository.purgeExpiredData()).thenReturn(Completable.complete());
+        when(pushedAuthorizationRequestRepository.purgeExpiredData()).thenReturn(Completable.complete());
+        when(cibaAuthRequestRepository.purgeExpiredData()).thenReturn(Completable.complete());
     }
 
     @Test
@@ -94,6 +102,8 @@ public class PurgeManagerTest {
         verify(refreshTokenRepository).purgeExpiredData();
         verify(requestObjectRepository).purgeExpiredData();
         verify(authenticationFlowContextRepository).purgeExpiredData();
+        verify(pushedAuthorizationRequestRepository).purgeExpiredData();
+        verify(cibaAuthRequestRepository).purgeExpiredData();
     }
 
     @Test
@@ -108,6 +118,8 @@ public class PurgeManagerTest {
         verify(refreshTokenRepository).purgeExpiredData();
         verify(requestObjectRepository).purgeExpiredData();
         verify(authenticationFlowContextRepository).purgeExpiredData();
+        verify(pushedAuthorizationRequestRepository).purgeExpiredData();
+        verify(cibaAuthRequestRepository).purgeExpiredData();
     }
 
     @Test
@@ -122,5 +134,7 @@ public class PurgeManagerTest {
         verify(refreshTokenRepository).purgeExpiredData();
         verify(requestObjectRepository).purgeExpiredData();
         verify(authenticationFlowContextRepository).purgeExpiredData();
+        verify(pushedAuthorizationRequestRepository).purgeExpiredData();
+        verify(cibaAuthRequestRepository).purgeExpiredData();
     }
 }

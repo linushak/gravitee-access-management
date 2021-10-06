@@ -18,10 +18,8 @@ package io.gravitee.am.management.services.purge;
 import io.gravitee.am.repository.management.api.AuthenticationFlowContextRepository;
 import io.gravitee.am.repository.management.api.LoginAttemptRepository;
 import io.gravitee.am.repository.management.api.PermissionTicketRepository;
-import io.gravitee.am.repository.oauth2.api.AccessTokenRepository;
-import io.gravitee.am.repository.oauth2.api.AuthorizationCodeRepository;
-import io.gravitee.am.repository.oauth2.api.RefreshTokenRepository;
-import io.gravitee.am.repository.oauth2.api.ScopeApprovalRepository;
+import io.gravitee.am.repository.oauth2.api.*;
+import io.gravitee.am.repository.oidc.api.CibaAuthRequestRepository;
 import io.gravitee.am.repository.oidc.api.RequestObjectRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +66,12 @@ public class PurgeManager {
     @Lazy
     @Autowired
     protected AuthenticationFlowContextRepository authenticationFlowContextRepository;
+    @Lazy
+    @Autowired
+    protected PushedAuthorizationRequestRepository pushedAuthorizationRequestRepository;
+    @Lazy
+    @Autowired
+    protected CibaAuthRequestRepository cibaAuthRequestRepository;
 
     protected List<TableName> tables = asList(TableName.values());
 
@@ -102,6 +106,12 @@ public class PurgeManager {
                     break;
                 case auth_flow_ctx:
                     authenticationFlowContextRepository.purgeExpiredData().subscribe();
+                    break;
+                case pushed_authorization_requests:
+                    pushedAuthorizationRequestRepository.purgeExpiredData().subscribe();
+                    break;
+                case ciba_auth_requests:
+                    cibaAuthRequestRepository.purgeExpiredData().subscribe();
                     break;
             }
         }

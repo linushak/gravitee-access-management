@@ -15,7 +15,6 @@
  */
 package io.gravitee.am.gateway.handler.oauth2.resources.handler.authorization;
 
-import com.nimbusds.jwt.EncryptedJWT;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
 import io.gravitee.am.common.exception.oauth2.InvalidRequestException;
@@ -42,6 +41,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static io.gravitee.am.gateway.handler.common.utils.ConstantKeys.*;
+import static io.gravitee.am.gateway.handler.oauth2.resources.handler.authorization.ParamUtils.splitScopes;
 
 /**
  * The request Authorization Request parameter enables OpenID Connect requests to be passed in a single,
@@ -91,7 +91,7 @@ public class AuthorizationRequestParseRequestObjectHandler extends AbstractAutho
         // logic that this is an OpenID Connect request.
         // NOTE: In FAPI specification (https://github.com/gravitee-io/issues/issues/5975), scope may come from the RequestObject
         String scope = context.request().getParam(io.gravitee.am.common.oauth2.Parameters.SCOPE);
-        HashSet<String> scopes = scope != null && !scope.isEmpty() ? new HashSet<>(Arrays.asList(scope.split("\\s+"))) : null;
+        Set<String> scopes = splitScopes(scope);
         if (!domain.usePlainFapiProfile() && (scopes == null || !scopes.contains(Scope.OPENID.getKey()))) {
             context.next();
             return;
