@@ -16,33 +16,35 @@
 
 package io.gravitee.am.gateway.handler.common.vertx.web.handler.impl.internal.mfa.filter;
 
-import io.gravitee.am.gateway.handler.common.vertx.web.handler.impl.internal.mfa.utils.MfaUtils;
-import io.gravitee.am.model.oidc.Client;
-import io.vertx.reactivex.ext.web.Session;
+import io.gravitee.am.gateway.handler.common.vertx.web.handler.impl.internal.mfa.MfaFilterContext;
 
 import java.util.function.Supplier;
-
-import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
  * @author Rémi SULTAN (remi.sultan at graviteesource.com)
  * @author GraviteeSource Team
  */
-public class MfaSkipUserStronglyAuthFilter implements Supplier<Boolean> {
+public class MfaSkipUserStronglyAuthFilter extends MfaContextHolder implements Supplier<Boolean> {
 
-    private final Client client;
-    private final Session session;
 
-    public MfaSkipUserStronglyAuthFilter(Client client, Session session) {
-        this.client = client;
-        this.session = session;
+    public MfaSkipUserStronglyAuthFilter(MfaFilterContext context) {
+        super(context);
     }
 
     @Override
     public Boolean get() {
-        String mfaStepUpRule = MfaUtils.getMfaStepUpRule(client);
-        String adaptiveMfaStepUpRule = MfaUtils.getAdaptiveMfaStepUpRule(client);
-        return isNullOrEmpty(mfaStepUpRule) && isNullOrEmpty(adaptiveMfaStepUpRule) &&
-                (MfaUtils.isUserStronglyAuth(session) || MfaUtils.isMfaSkipped(session));
+        final boolean userStronglyAuth = context.isUserStronglyAuth();
+        // We need to check whether the AMFA and Device rule is false since we don't know of other MFA features passed or skipped MFA
+        // However if the user is strongly auth we don't need to enforce MFA
+        if (!userStronglyAuth && (
+                context.isAmfaActive() && !context.isAmfaRuleTrue() ||
+                (context.getRememberDeviceSettings().isActive() && !context.deviceAlreadyExists() && !context.isMfaSkipped())
+        )
+        ) {
+            return false;
+        } else if (context.isAmfaActive() && context.isAmfaRuleTrue()) {
+            return true;
+        }
+        return !context.isStepUpActive() && (userStronglyAuth || context.isMfaSkipped());
     }
 }

@@ -18,11 +18,11 @@ package io.gravitee.am.gateway.handler.root.resources.endpoint.mfa;
 import io.gravitee.am.common.factor.FactorSecurityType;
 import io.gravitee.am.factor.api.Enrollment;
 import io.gravitee.am.factor.api.FactorProvider;
+import io.gravitee.am.gateway.handler.common.factor.FactorManager;
+import io.gravitee.am.gateway.handler.common.ruleengine.RuleEngine;
 import io.gravitee.am.gateway.handler.common.utils.ConstantKeys;
 import io.gravitee.am.gateway.handler.common.vertx.utils.RequestUtils;
 import io.gravitee.am.gateway.handler.common.vertx.utils.UriBuilderRequest;
-import io.gravitee.am.gateway.handler.common.factor.FactorManager;
-import io.gravitee.am.gateway.handler.manager.form.FormManager;
 import io.gravitee.am.gateway.handler.root.resources.endpoint.AbstractEndpoint;
 import io.gravitee.am.model.Template;
 import io.gravitee.am.model.User;
@@ -31,7 +31,6 @@ import io.gravitee.am.model.factor.EnrolledFactorChannel;
 import io.gravitee.am.model.factor.EnrolledFactorSecurity;
 import io.gravitee.am.model.oidc.Client;
 import io.gravitee.common.http.HttpHeaders;
-import io.gravitee.common.http.MediaType;
 import io.reactivex.Observable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -41,7 +40,6 @@ import io.vertx.reactivex.core.http.HttpServerRequest;
 import io.vertx.reactivex.core.http.HttpServerResponse;
 import io.vertx.reactivex.ext.web.RoutingContext;
 import io.vertx.reactivex.ext.web.common.template.TemplateEngine;
-import io.vertx.reactivex.ext.web.templ.thymeleaf.ThymeleafTemplateEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -154,6 +152,7 @@ public class MFAEnrollEndpoint extends AbstractEndpoint implements Handler<Routi
 
         // manage enrolled factors
         // if user has skipped the enrollment process, continue
+        // only allow skipping if Adaptive MD
         if (!acceptEnrollment) {
             routingContext.session().put(ConstantKeys.MFA_SKIPPED_KEY, true);
         } else {
