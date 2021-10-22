@@ -40,6 +40,8 @@ services:
     volumes:
       - datamongo:/data/db
       - ./logs/am-mongodb:/var/log/mongodb
+    ports:
+      - 27017:27017
 
   gateway:
     image: graviteeio/am-gateway:${GIO_AM_VERSION}
@@ -61,6 +63,8 @@ services:
     restart: always
     links:
       - mongodb
+    ports:
+      - 8093:8093
     depends_on:
       - mongodb
     volumes:
