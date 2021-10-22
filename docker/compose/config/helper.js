@@ -6,7 +6,9 @@ MongoClient.connect(url, function(err, db) {
     var dbo = db.db("graviteeam");
     dbo.collection("domains").findOne({}, function(err, result) {
       if (err) throw err;
-      console.log("success");
+      if (result == "linus") {
+        console.log("success");
+      }
       db.close();
     });
   });
